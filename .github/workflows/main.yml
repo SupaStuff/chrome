@@ -1,0 +1,71 @@
+name: Build and Push Docker Image
+on:
+  push:
+    branches:
+      - main
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  push_to_registry:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2.3.4
+
+      - name: Set lowercase actor
+        run: echo "github_actor=${GITHUB_ACTOR,,}" >> $GITHUB_ENV
+
+      - name: Set image name
+        run: echo "image_name=$GITHUB_REPOSITORY" | sed "s/=.*\//=$github_actor\//" >> $GITHUB_ENV
+
+      - name: Set short sha tag
+        run: echo "sha=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1.10.0
+        with:
+          username: ${{ env.github_actor }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1.10.0
+        with:
+          registry: ghcr.io
+          username: ${{ env.github_actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push base image
+        uses: docker/build-push-action@v2.6.1
+        with:
+          target: build-chrome
+          push: true
+          tags: |
+            ${{ env.image_name }}:latest
+            ${{ env.image_name }}:${{ env.sha }}
+            ghcr.io/${{ env.image_name }}:latest
+            ghcr.io/${{ env.image_name }}:${{ env.sha }}
+
+      - name: Push chrome + python
+        uses: docker/build-push-action@v2.6.1
+        with:
+          target: build-jupyter
+          push: true
+          tags: |
+            ${{ env.image_name }}:jupyter
+            ${{ env.image_name }}:jupyter-${{ env.sha }}
+            ghcr.io/${{ env.image_name }}:jupyter
+            ghcr.io/${{ env.image_name }}:jupyter-${{ env.sha }}
+
+      - name: Push devcontainer
+        uses: docker/build-push-action@v2.6.1
+        with:
+          target: build-vscode
+          push: true
+          tags: |
+            ${{ env.image_name }}:vscode
+            ${{ env.image_name }}:vscode-${{ env.sha }}
+            ghcr.io/${{ env.image_name }}:vscode
+            ghcr.io/${{ env.image_name }}:vscode-${{ env.sha }}
