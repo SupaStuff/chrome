@@ -22,9 +22,7 @@ Typically, I'll point _.devcontainer/.devcontainer.json_ to a _docker-compose.ya
 version: "3"
 services:
   vscode:
-    environment:
-      CONTAINER_USER: vscode
-    user: ${CONTAINER_USER}
+    user: vscode
     image: supastuff/chrome:vscode
 
     volumes:
@@ -49,3 +47,6 @@ volumes:
 
 `tslab` is installed globally so that it can be used by VSCode's native .ipynb file support.
 Select tslab as your kernel and it just works. But only because it's installed globally.
+
+See [example.ipynb](example.ipynb) for a sample notebook made using `supastuff/chrome:vscode`.
+It explores example.com with Puppeteer.
