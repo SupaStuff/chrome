@@ -9,20 +9,26 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v2.3.4
 
-      - name: Test chrome image
+      - name: Test Chrome image
         uses: docker/build-push-action@v2.6.1
         with:
           target: test-chrome
           push: false
 
-      - name: Test
+      - name: Test Chrome + Jupyter image
         uses: docker/build-push-action@v2.6.1
         with:
           target: test-jupyter
           push: false
 
-      - name: Test image
+      - name: Test devcontainer image
         uses: docker/build-push-action@v2.6.1
         with:
           target: test-vscode
+          push: false
+
+      - name: Test devcontainer + Jupyter image
+        uses: docker/build-push-action@v2.6.1
+        with:
+          target: test-jupyter-vscode
           push: false

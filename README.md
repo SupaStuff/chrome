@@ -11,11 +11,12 @@ There are 3 images produced by this Dockerfile:
 
 - `supastuff/chrome`: The base image with `google-chrome-stable` installed so that you can use headless chrome with your **locally** installed Puppeteer (`npm install --save puppeteer`).
 - `supastuff/chrome:jupyter`: Python, Jupyter, and tslab installed on top of `supastuff/chrome`.
-- `supastuff/chrome:vscode`: Image meant to be used with VSCode's devcontainers feature. Based on `supastuff/chrome:jupyter`. Adds user **vscode** with id 1000 and creates directories owned by **vscode** to prevent permission denied isssues.
+- `supastuff/chrome:vscode`: Image meant to be used with VSCode's devcontainers feature. Based on `supastuff/chrome`. Adds user **vscode** with id 1000 and creates directories owned by **vscode** to prevent permission denied isssues.
+- `supastuff/chrome:jupyter-vscode`: Image meant to be used with VSCode's devcontainers feature. Based on `supastuff/chrome:jupyter`. Adds user **vscode** with id 1000 and creates directories owned by **vscode** to prevent permission denied isssues.
 
 ## Usage
 
-Use like any other Docker image. The more interesting image is `supastuff/chrome:vscode`.
+Use like any other Docker image. The more interesting images are `supastuff/chrome:vscode` and `supastuff/chrome:jupyter-vscode`.
 Typically, I'll point _.devcontainer/.devcontainer.json_ to a _docker-compose.yaml_ that looks like this:
 
 ```yaml
@@ -45,8 +46,8 @@ volumes:
   vscode_server_insiders:
 ```
 
-`tslab` is installed globally so that it can be used by VSCode's native .ipynb file support.
+In `supastuff/chrome:jupyter-vscode`, `tslab` is installed globally so that it can be used by VSCode's native .ipynb file support.
 Select tslab as your kernel and it just works. But only because it's installed globally.
 
-See [example.ipynb](example.ipynb) for a sample notebook made using `supastuff/chrome:vscode`.
+See [example.ipynb](example.ipynb) for a sample notebook made using `supastuff/chrome:jupyter-vscode`.
 It explores example.com with Puppeteer.

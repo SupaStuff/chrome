@@ -3,6 +3,8 @@
 FROM node:16-slim as build-chrome
 LABEL org.opencontainers.image.source https://github.com/SupaStuff/chrome
 
+ARG USERNAME=vscode
+
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
                     ca-certificates \
@@ -58,9 +60,28 @@ RUN jupyter --version
 RUN tslab install --version
 
 
-FROM build-jupyter as build-vscode
+FROM build-chrome as build-vscode
 
-ARG USERNAME=vscode
+RUN usermod --login $USERNAME --move-home --home /home/$USERNAME $(id -nu 1000) \
+ && mkdir -p /home/$USERNAME/workspace/node_modules \
+        /home/$USERNAME/.vscode-server/extensions \
+        /home/$USERNAME/.vscode-server-insiders/extensions \
+ && chown -R $USERNAME \
+        /home/$USERNAME/workspace \
+        /home/$USERNAME/.vscode-server \
+        /home/$USERNAME/.vscode-server-insiders
+
+USER $USERNAME
+WORKDIR /home/$USERNAME
+
+FROM build-vscode as test-vscode
+
+RUN set -ex
+RUN [ $(whoami) = "vscode" ]
+RUN [ $(id -u) = 1000 ]
+
+
+FROM build-jupyter as build-jupyter-vscode
 
 RUN usermod --login $USERNAME --move-home --home /home/$USERNAME $(id -nu 1000) \
  && mkdir -p /home/$USERNAME/workspace/node_modules \
@@ -76,8 +97,7 @@ RUN usermod --login $USERNAME --move-home --home /home/$USERNAME $(id -nu 1000) 
 USER $USERNAME
 WORKDIR /home/$USERNAME
 
-
-FROM build-vscode as test-vscode
+FROM build-jupyter-vscode as test-jupyter-vscode
 
 RUN set -ex
 RUN [ $(whoami) = "vscode" ]
