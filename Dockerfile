@@ -11,6 +11,7 @@ RUN apt-get update \
                     curl \
                     git \
                     gnupg \
+                    less \
                     ssh-client \
                     vim \
  && rm -rf /var/lib/apt/lists/*
