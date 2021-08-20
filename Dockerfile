@@ -23,9 +23,6 @@ RUN curl -s https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add 
                     google-chrome-stable \
  && rm -rf /var/lib/apt/lists/*
 
-# Until I figure out how to get the sandbox to work in Docker container
-ENV RESUME_PUPPETEER_NO_SANDBOX=true
-
 RUN npm install -g npm@7.19.1
 
 
@@ -73,14 +70,12 @@ RUN usermod --login $USERNAME --move-home --home /home/$USERNAME $(id -nu 1000) 
         /home/$USERNAME/.vscode-server \
         /home/$USERNAME/.vscode-server-insiders
 
-USER $USERNAME
 WORKDIR /home/$USERNAME
 
 FROM build-vscode as test-vscode
 
 RUN set -ex
-RUN [ $(whoami) = "vscode" ]
-RUN [ $(id -u) = 1000 ]
+RUN [ $(id -u vscode) = 1000 ]
 
 
 FROM build-jupyter as build-jupyter-vscode
@@ -96,11 +91,9 @@ RUN usermod --login $USERNAME --move-home --home /home/$USERNAME $(id -nu 1000) 
         /home/$USERNAME/.vscode-server \
         /home/$USERNAME/.vscode-server-insiders
 
-USER $USERNAME
 WORKDIR /home/$USERNAME
 
 FROM build-jupyter-vscode as test-jupyter-vscode
 
 RUN set -ex
-RUN [ $(whoami) = "vscode" ]
-RUN [ $(id -u) = 1000 ]
+RUN [ $(id -u vscode) = 1000 ]
