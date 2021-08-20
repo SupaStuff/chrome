@@ -12,6 +12,7 @@ RUN apt-get update \
                     git \
                     gnupg \
                     less \
+                    libgl1-mesa-glx \
                     ssh-client \
                     vim \
  && rm -rf /var/lib/apt/lists/*
@@ -23,7 +24,7 @@ RUN curl -s https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add 
                     google-chrome-stable \
  && rm -rf /var/lib/apt/lists/*
 
-RUN npm install -g npm@7.19.1
+RUN npm install -g npm@7.21.0
 
 
 FROM build-chrome as test-chrome
@@ -40,7 +41,6 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends \
                     python3 \
                     python3-pip \
-                    libgl1-mesa-glx \
  && python3 -m pip install --upgrade \
                            pip \
                            setuptools \
