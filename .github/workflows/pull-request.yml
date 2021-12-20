@@ -15,6 +15,12 @@ jobs:
           target: test-chrome
           push: false
 
+      - name: Test Chrome + Python image
+        uses: docker/build-push-action@v2.7.0
+        with:
+          target: test-python
+          push: false
+
       - name: Test Chrome + Jupyter image
         uses: docker/build-push-action@v2.7.0
         with:
@@ -25,6 +31,12 @@ jobs:
         uses: docker/build-push-action@v2.7.0
         with:
           target: test-vscode
+          push: false
+
+      - name: Test devcontainer + Python image
+        uses: docker/build-push-action@v2.7.0
+        with:
+          target: test-python-vscode
           push: false
 
       - name: Test devcontainer + Jupyter image

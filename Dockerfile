@@ -35,7 +35,7 @@ RUN git --version
 RUN google-chrome --version
 
 
-FROM build-chrome as build-jupyter
+FROM build-chrome as build-python
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
@@ -45,16 +45,25 @@ RUN apt-get update \
                            pip \
                            setuptools \
                            wheel \
- && python3 -m pip install jupyter \
- && npm install -g tslab \
- && tslab install \
  && rm -rf /var/lib/apt/lists/*
+
+
+FROM build-python as test-python
+
+RUN set -ex
+RUN python3 --version
+
+
+FROM build-python as build-jupyter
+
+RUN python3 -m pip install jupyter \
+ && npm install -g tslab \
+ && tslab install
 
 
 FROM build-jupyter as test-jupyter
 
 RUN set -ex
-RUN python3 --version
 RUN jupyter --version
 RUN tslab install --version
 
@@ -73,6 +82,27 @@ RUN usermod --login $USERNAME --move-home --home /home/$USERNAME $(id -nu 1000) 
 WORKDIR /home/$USERNAME
 
 FROM build-vscode as test-vscode
+
+RUN set -ex
+RUN [ $(id -u vscode) = 1000 ]
+
+
+FROM build-python as build-python-vscode
+
+RUN usermod --login $USERNAME --move-home --home /home/$USERNAME $(id -nu 1000) \
+ && mkdir -p /home/$USERNAME/workspace/node_modules \
+        /home/$USERNAME/.local \
+        /home/$USERNAME/.vscode-server/extensions \
+        /home/$USERNAME/.vscode-server-insiders/extensions \
+ && chown -R $USERNAME \
+        /home/$USERNAME/.local \
+        /home/$USERNAME/workspace \
+        /home/$USERNAME/.vscode-server \
+        /home/$USERNAME/.vscode-server-insiders
+
+WORKDIR /home/$USERNAME
+
+FROM build-python-vscode as test-python-vscode
 
 RUN set -ex
 RUN [ $(id -u vscode) = 1000 ]
